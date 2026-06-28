@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useUser, UserButton, SignInButton } from "@clerk/nextjs";
 
 export default function Navbar() {
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
 
   return (
     <nav className="border-b border-slate-200 bg-white">
