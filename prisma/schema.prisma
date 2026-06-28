@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  clerkId     String   @unique
+  email       String   @unique
+  name        String?
+  role        Role     @default(CANDIDATE)
+  createdAt   DateTime @default(now())
+
+  candidate   Candidate?
+  employer    Employer?
+}
+
+enum Role {
+  CANDIDATE
+  EMPLOYER
+}
+
+model Candidate {
+  id          String        @id @default(cuid())
+  userId      String        @unique
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  headline    String?
+  bio         String?
+  location    String?
+  workHistory WorkHistory[]
+  applications Application[]
+  createdAt   DateTime      @default(now())
+}
+
+model WorkHistory {
+  id              String      @id @default(cuid())
+  candidateId     String
+  candidate       Candidate   @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  jobTitle        String
+  company         String
+  startDate       DateTime
+  endDate         DateTime?
+  current         Boolean     @default(false)
+  managerName     String
+  managerEmail    String
+  npiNumber       String?
+  npiVerified     Boolean     @default(false)
+  verificationStatus VerificationStatus @default(PENDING)
+  verificationToken  String?   @unique
+  verifiedAt      DateTime?
+  createdAt       DateTime    @default(now())
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model Employer {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName String
+  website     String?
+  description String?
+  verified    Boolean  @default(false)
+  jobs        Job[]
+  createdAt   DateTime @default(now())
+}
+
+model Job {
+  id           String        @id @default(cuid())
+  employerId   String
+  employer     Employer      @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  title        String
+  specialty    String
+  location     String
+  jobType      JobType
+  salary       String?
+  description  String
+  requirements String?
+  active       Boolean       @default(true)
+  applications Application[]
+  createdAt    DateTime      @default(now())
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  PER_DIEM
+}
+
+model Application {
+  id          String   @id @default(cuid())
+  jobId       String
+  job         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  coverLetter String?
+  status      ApplicationStatus @default(APPLIED)
+  createdAt   DateTime @default(now())
+
+  @@unique([jobId, candidateId])
+}
+
+enum ApplicationStatus {
+  APPLIED
+  REVIEWING
+  INTERVIEW
+  OFFER
+  REJECTED
+}
