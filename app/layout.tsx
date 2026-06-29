@@ -3,10 +3,10 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const font = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-plus-jakarta",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${plusJakartaSans.variable} font-sans antialiased`}>{children}</body>
+        <body className={font.className}>{children}</body>
       </html>
     </ClerkProvider>
   );
