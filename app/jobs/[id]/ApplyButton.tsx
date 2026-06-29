@@ -46,7 +46,7 @@ export default function ApplyButton({
     <button
       onClick={handleApply}
       disabled={loading}
-      className="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm text-sm"
+      className="bg-[#0A66C2] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#004182] disabled:opacity-50 transition-colors shadow-sm text-sm"
     >
       {loading ? "Applying..." : "Apply Now"}
     </button>
