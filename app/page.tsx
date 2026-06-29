@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import Logo from "@/components/Logo";
 
 export default function HomePage() {
   return (
@@ -221,8 +222,8 @@ export default function HomePage() {
 
       <footer className="border-t border-gray-200 py-8 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-[#0A66C2] text-xl">✦</span>
+          <div className="flex items-center gap-2.5">
+            <Logo size={26} />
             <span className="font-bold text-gray-900">HealthHire</span>
           </div>
           <p className="text-sm text-gray-400">© 2025 HealthHire. All rights reserved.</p>
