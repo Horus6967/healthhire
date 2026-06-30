@@ -205,7 +205,7 @@ export default function HomePage() {
           <p className="text-blue-200 mb-8">Join the platform where every hire starts with verified information.</p>
           <div className="flex gap-3 justify-center flex-wrap">
             <Link
-              href="/onboarding/candidate"
+              href="/sign-up"
               className="bg-white text-[#0A66C2] px-8 py-3 rounded-full font-semibold hover:bg-blue-50 transition-colors text-sm"
             >
               I&apos;m a Candidate

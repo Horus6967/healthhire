@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useUser, UserButton, SignInButton } from "@clerk/nextjs";
+import { useUser, UserButton } from "@clerk/nextjs";
 import Logo from "./Logo";
 
 export default function Navbar() {
@@ -26,26 +26,25 @@ export default function Navbar() {
 
             {isSignedIn ? (
               <div className="flex items-center gap-4">
-                <Link
-                  href="/dashboard/candidate"
-                  className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
-                >
+                <Link href="/dashboard/candidate" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">
                   Dashboard
                 </Link>
                 <UserButton />
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <SignInButton mode="modal">
-                  <button className="text-[#0A66C2] hover:bg-blue-50 border border-[#0A66C2] px-4 py-1.5 rounded-full text-sm font-semibold transition-colors">
-                    Sign in
-                  </button>
-                </SignInButton>
-                <SignInButton mode="modal">
-                  <button className="bg-[#0A66C2] hover:bg-[#004182] text-white px-4 py-1.5 rounded-full text-sm font-semibold transition-colors">
-                    Join now
-                  </button>
-                </SignInButton>
+                <Link
+                  href="/sign-in"
+                  className="text-[#0A66C2] hover:bg-blue-50 border border-[#0A66C2] px-4 py-1.5 rounded-full text-sm font-semibold transition-colors"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/sign-up"
+                  className="bg-[#0A66C2] hover:bg-[#004182] text-white px-4 py-1.5 rounded-full text-sm font-semibold transition-colors"
+                >
+                  Join now
+                </Link>
               </div>
             )}
           </div>
