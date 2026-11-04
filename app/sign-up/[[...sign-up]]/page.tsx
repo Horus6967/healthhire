@@ -11,8 +11,6 @@ export default function SignUpPage() {
               card: "shadow-md rounded-2xl border border-gray-200",
             },
           }}
-          redirectUrl="/onboarding/candidate"
-          afterSignUpUrl="/onboarding/candidate"
         />
       </div>
     </div>

@@ -11,8 +11,6 @@ export default function SignInPage() {
               card: "shadow-md rounded-2xl border border-gray-200",
             },
           }}
-          redirectUrl="/dashboard/candidate"
-          afterSignInUrl="/dashboard/candidate"
         />
       </div>
     </div>

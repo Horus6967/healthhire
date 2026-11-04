@@ -8,7 +8,7 @@ export default function CandidateOnboarding() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ headline: "", bio: "", location: "" });
+  const [form, setForm] = useState({ headline: "", bio: "", location: "", specialty: "" });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -21,7 +21,7 @@ export default function CandidateOnboarding() {
         body: JSON.stringify(form),
       });
       if (res.ok) {
-        router.push("/dashboard/candidate");
+        router.push("/screening");
       } else {
         const data = await res.json().catch(() => ({})) as { error?: string };
         setError(data.error || "Something went wrong. Please try again.");
@@ -52,6 +52,19 @@ export default function CandidateOnboarding() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Your specialty</label>
+              <select
+                value={form.specialty}
+                onChange={(e) => setForm({ ...form, specialty: e.target.value })}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent transition"
+              >
+                <option value="">Select your specialty...</option>
+                {["Registered Nurse (RN)","Licensed Practical Nurse (LPN)","Physician / MD","Physician Assistant (PA)","Nurse Practitioner (NP)","Physical Therapist (PT)","Occupational Therapist (OT)","Pharmacist","Medical Assistant (MA)","Radiologic Technologist","Respiratory Therapist","Emergency Medical Technician (EMT)","Surgical Technologist","Dentist","Other Healthcare Professional"].map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Professional headline</label>
               <input

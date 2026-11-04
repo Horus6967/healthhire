@@ -5,7 +5,7 @@ import { useUser, UserButton } from "@clerk/nextjs";
 import Logo from "./Logo";
 
 export default function Navbar() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
 
   return (
     <nav className="border-b border-gray-200 bg-white sticky top-0 z-50">
@@ -17,16 +17,16 @@ export default function Navbar() {
           </Link>
 
           <div className="flex items-center gap-5">
-            <Link href="/jobs" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">
-              Jobs
-            </Link>
-            <Link href="/onboarding/employer" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors hidden sm:block">
+            <Link href="/employers/candidates" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors hidden sm:block">
               For Employers
             </Link>
 
             {isSignedIn ? (
               <div className="flex items-center gap-4">
-                <Link href="/dashboard/candidate" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">
+                <Link
+                  href={user?.publicMetadata?.role === "EMPLOYER" ? "/dashboard/employer" : "/dashboard/candidate"}
+                  className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
+                >
                   Dashboard
                 </Link>
                 <UserButton />

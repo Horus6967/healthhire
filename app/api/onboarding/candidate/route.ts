@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { headline, bio, location } = await req.json();
+  const { headline, bio, location, specialty } = await req.json() as { headline?: string; bio?: string; location?: string; specialty?: string };
 
   // Get full user details from Clerk in case they haven't been synced via webhook yet
   const clerkUser = await currentUser();
@@ -28,8 +28,8 @@ export async function POST(req: Request) {
 
   const candidate = await prisma.candidate.upsert({
     where: { userId: user.id },
-    update: { headline, bio, location },
-    create: { userId: user.id, headline, bio, location },
+    update: { headline, bio, location, specialty },
+    create: { userId: user.id, headline, bio, location, specialty },
   });
 
   return NextResponse.json(candidate);

@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
-import PostJobForm from "./PostJobForm";
 
 export default async function EmployerDashboard() {
   const { userId } = await auth();
@@ -15,16 +14,13 @@ export default async function EmployerDashboard() {
     include: {
       employer: {
         include: {
-          jobs: {
+          unlocks: {
             include: {
-              applications: {
+              candidate: {
                 include: {
-                  candidate: {
-                    include: {
-                      user: true,
-                      workHistory: true,
-                    },
-                  },
+                  user: { select: { name: true, email: true } },
+                  screening: { select: { score: true } },
+                  workHistory: { where: { verificationStatus: "VERIFIED" }, take: 1 },
                 },
               },
             },
@@ -35,133 +31,119 @@ export default async function EmployerDashboard() {
     },
   });
 
-  if (!user) redirect("/onboarding/employer");
+  if (!user) redirect("/sign-in");
   if (!user.employer) redirect("/onboarding/employer");
 
   const employer = user.employer;
-  const totalApplicants = employer.jobs.reduce((sum, j) => sum + j.applications.length, 0);
-  const activeJobs = employer.jobs.filter((j) => j.active).length;
+  const totalUnlocks = employer.unlocks.length;
+
+  const verifiedCandidateCount = await prisma.candidate.count({
+    where: { screening: { status: "COMPLETED" } },
+  });
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
+
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
 
         {/* Header */}
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Employer Dashboard</h1>
-            <p className="text-slate-500 text-sm mt-1">{employer.companyName}</p>
+            <h1 className="text-2xl font-bold text-gray-900">{employer.companyName}</h1>
+            <p className="text-gray-500 text-sm mt-1">Employer Dashboard</p>
           </div>
-          <Link href="/jobs" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors">
-            View job board →
+          <Link
+            href="/employers/candidates"
+            className="bg-[#0A66C2] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#004182] transition-colors shadow-sm"
+          >
+            Find Candidates →
           </Link>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white border border-slate-200 rounded-2xl p-5">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Active Jobs</p>
-            <p className="text-3xl font-bold text-slate-900">{activeJobs}</p>
+          <div className="bg-white border border-gray-200 rounded-2xl p-5">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Candidates Unlocked</p>
+            <p className="text-3xl font-bold text-gray-900">{totalUnlocks}</p>
           </div>
-          <div className="bg-white border border-slate-200 rounded-2xl p-5">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Total Applicants</p>
-            <p className="text-3xl font-bold text-slate-900">{totalApplicants}</p>
+          <div className="bg-white border border-gray-200 rounded-2xl p-5">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Available Now</p>
+            <p className="text-3xl font-bold text-gray-900">{verifiedCandidateCount}</p>
+            <p className="text-xs text-gray-400 mt-1">verified candidates</p>
           </div>
-          <div className="bg-white border border-slate-200 rounded-2xl p-5">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Total Postings</p>
-            <p className="text-3xl font-bold text-slate-900">{employer.jobs.length}</p>
+          <div className="bg-white border border-gray-200 rounded-2xl p-5">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Company</p>
+            <p className="text-sm font-semibold text-gray-700 truncate">{employer.companyName}</p>
+            {employer.website && (
+              <a href={employer.website} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline mt-0.5 block truncate">
+                {employer.website}
+              </a>
+            )}
           </div>
         </div>
 
-        {/* Post job */}
-        <PostJobForm employerId={employer.id} />
-
-        {/* Job listings */}
-        <div className="space-y-4">
-          {employer.jobs.length === 0 ? (
-            <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center">
-              <div className="text-3xl mb-3">📋</div>
-              <p className="text-slate-500 font-medium mb-1">No jobs posted yet</p>
-              <p className="text-slate-400 text-sm">Use the form above to post your first listing.</p>
+        {/* Find candidates CTA */}
+        {totalUnlocks === 0 && (
+          <div className="bg-gradient-to-r from-[#0A66C2] to-blue-500 rounded-2xl p-6 text-white flex items-center justify-between gap-4">
+            <div>
+              <p className="font-bold text-lg mb-1">Browse {verifiedCandidateCount} verified candidates</p>
+              <p className="text-blue-100 text-sm">Every candidate has completed AI screening and work history verification. Unlock contact info for $49.</p>
             </div>
-          ) : (
-            employer.jobs.map((job) => (
-              <div key={job.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                {/* Job header */}
-                <div className="flex justify-between items-start px-6 py-5 border-b border-slate-100">
-                  <div className="min-w-0 flex-1 mr-4">
-                    <div className="flex items-center gap-3 mb-1">
-                      <Link href={`/jobs/${job.id}`} className="font-bold text-slate-900 hover:text-blue-600 transition-colors">
-                        {job.title}
-                      </Link>
-                      <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${
-                        job.active ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"
-                      }`}>
-                        {job.active ? "Active" : "Closed"}
-                      </span>
-                    </div>
-                    <p className="text-slate-400 text-sm">{job.location} · {job.specialty}</p>
-                  </div>
-                  <div className="flex-shrink-0 text-xs text-slate-400 mt-1">
-                    {new Date(job.createdAt).toLocaleDateString()}
-                  </div>
-                </div>
+            <Link
+              href="/employers/candidates"
+              className="flex-shrink-0 bg-white text-[#0A66C2] px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-50 transition-colors whitespace-nowrap"
+            >
+              Browse Now →
+            </Link>
+          </div>
+        )}
 
-                {/* Applicants */}
-                <div className="px-6 py-4">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                    {job.applications.length} Applicant{job.applications.length !== 1 ? "s" : ""}
-                  </p>
-                  {job.applications.length === 0 ? (
-                    <p className="text-slate-400 text-sm">No applicants yet.</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {job.applications.map((app) => {
-                        const verifiedCount = app.candidate.workHistory.filter(
-                          (w) => w.verificationStatus === "VERIFIED" || w.npiVerified
-                        ).length;
-                        return (
-                          <div key={app.id} className="flex justify-between items-center bg-slate-50 rounded-xl px-4 py-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs flex-shrink-0">
-                                {(app.candidate.user.name || app.candidate.user.email || "?")[0].toUpperCase()}
-                              </div>
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <span className="font-semibold text-slate-800 text-sm">
-                                    {app.candidate.user.name || app.candidate.user.email}
-                                  </span>
-                                  {verifiedCount > 0 && (
-                                    <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-semibold border border-green-200">
-                                      ✓ {verifiedCount} verified role{verifiedCount > 1 ? "s" : ""}
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-xs text-slate-400 mt-0.5">
-                                  Applied {new Date(app.createdAt).toLocaleDateString()}
-                                </p>
-                              </div>
-                            </div>
-                            <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${
-                              app.status === "APPLIED"    ? "bg-blue-50 text-blue-600 border-blue-200" :
-                              app.status === "REVIEWING"  ? "bg-purple-50 text-purple-600 border-purple-200" :
-                              app.status === "INTERVIEW"  ? "bg-green-50 text-green-600 border-green-200" :
-                              app.status === "OFFER"      ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                              "bg-red-50 text-red-500 border-red-200"
-                            }`}>
-                              {app.status.charAt(0) + app.status.slice(1).toLowerCase()}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+        {/* Unlocked candidates */}
+        {totalUnlocks > 0 && (
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+              <div>
+                <h2 className="font-semibold text-gray-900">Unlocked Candidates</h2>
+                <p className="text-xs text-gray-400 mt-0.5">Candidates you have access to contact</p>
               </div>
-            ))
-          )}
-        </div>
+              <Link href="/employers/candidates" className="text-sm text-blue-600 font-semibold hover:underline">
+                Find more →
+              </Link>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {employer.unlocks.map((unlock) => {
+                const c = unlock.candidate;
+                const initials = (c.user.name || c.user.email)
+                  .split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+                return (
+                  <div key={unlock.id} className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
+                    <div className="w-10 h-10 rounded-full bg-[#0A66C2]/10 flex items-center justify-center text-[#0A66C2] font-bold text-sm flex-shrink-0">
+                      {initials}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 text-sm">{c.user.name || "Healthcare Professional"}</p>
+                      <p className="text-blue-600 text-xs">{c.user.email}</p>
+                      <p className="text-gray-400 text-xs mt-0.5">{c.headline || "Healthcare Professional"} · {c.location || "—"}</p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {c.workHistory.length > 0 && (
+                        <span className="bg-green-50 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-green-200">
+                          ✓ Verified
+                        </span>
+                      )}
+                      {c.screening?.score !== undefined && (
+                        <span className="bg-blue-50 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-blue-200">
+                          Score: {c.screening.score}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
