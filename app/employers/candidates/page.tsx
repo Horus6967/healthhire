@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
 import UnlockButton from "./UnlockButton";
 
 export default async function CandidateDiscovery({
@@ -152,7 +153,13 @@ export default async function CandidateDiscovery({
                   </div>
 
                   {/* Action */}
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 flex items-center gap-2">
+                    <Link
+                      href={`/candidate/${candidate.id}`}
+                      className="border border-gray-200 text-gray-600 px-3 py-2 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      View
+                    </Link>
                     {isUnlocked ? (
                       <span className="inline-flex items-center gap-1.5 bg-green-50 text-green-700 border border-green-200 text-sm font-semibold px-4 py-2 rounded-xl">
                         ✓ Unlocked
