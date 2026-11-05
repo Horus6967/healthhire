@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import WorkHistorySection from "./WorkHistorySection";
+import { getScreeningBand, type ScreeningFeedback } from "@/lib/screeningBand";
 
 export default async function CandidateDashboard() {
   const { userId } = await auth();
@@ -33,6 +34,7 @@ export default async function CandidateDashboard() {
   const screening = candidate.screening;
   const screeningDone = screening?.status === "COMPLETED";
   const score = screening?.score;
+  const feedback = screening?.feedback as ScreeningFeedback | null | undefined;
 
   const scoreColor = score !== undefined && score !== null
     ? score >= 75 ? "text-[#3ECF8E]" : score >= 50 ? "text-yellow-400" : "text-red-400"
@@ -67,6 +69,9 @@ export default async function CandidateDashboard() {
                 <p className={`text-3xl font-bold ${scoreColor}`}>
                   {score}<span className="text-sm font-normal text-white/30">/100</span>
                 </p>
+                {score !== null && score !== undefined && (
+                  <p className="text-sm font-semibold text-white/70 mt-1">{getScreeningBand(score).label} profile</p>
+                )}
                 <p className="text-xs text-[#3ECF8E] mt-1 font-medium">✓ Complete</p>
               </div>
             ) : (
@@ -116,6 +121,27 @@ export default async function CandidateDashboard() {
             >
               Start Now →
             </Link>
+          </div>
+        )}
+
+        {/* Private profile tips (candidate only) */}
+        {screeningDone && feedback?.improvements && feedback.improvements.length > 0 && (
+          <div className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-6">
+            <p className="font-bold text-white mb-1">How to strengthen your profile</p>
+            <p className="text-white/40 text-sm mb-4">
+              These tips are private to you. Following them helps employers see your strengths.
+            </p>
+            {feedback.summary && (
+              <p className="text-white/50 text-sm leading-relaxed mb-4">{feedback.summary}</p>
+            )}
+            <ul className="space-y-2">
+              {feedback.improvements.map((tip) => (
+                <li key={tip} className="text-sm text-white/60 flex gap-3">
+                  <span className="text-yellow-400 flex-shrink-0">→</span>
+                  <span>{tip}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 

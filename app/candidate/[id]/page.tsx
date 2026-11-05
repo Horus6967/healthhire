@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import UnlockButton from "@/app/employers/candidates/UnlockButton";
+import { getScreeningBand, type ScreeningFeedback } from "@/lib/screeningBand";
 
 export default async function CandidateProfilePage({
   params,
@@ -25,7 +26,7 @@ export default async function CandidateProfilePage({
     include: {
       user: { select: { name: true, email: true } },
       workHistory: { orderBy: { startDate: "desc" } },
-      screening: { select: { score: true, status: true } },
+      screening: { select: { score: true, status: true, feedback: true } },
     },
   });
 
@@ -69,7 +70,7 @@ export default async function CandidateProfilePage({
                     (score ?? 0) >= 50 ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
                     "bg-gray-50 text-gray-600 border-gray-200"
                   }`}>
-                    AI Score: {score}/100
+                    AI Score: {score}/100 · {getScreeningBand(score ?? 0).label}
                   </span>
                 )}
                 {verifiedHistory.length > 0 && (
@@ -150,11 +151,25 @@ export default async function CandidateProfilePage({
               </div>
               <div>
                 <p className="font-semibold text-gray-900">
-                  {(score ?? 0) >= 75 ? "Strong candidate" : (score ?? 0) >= 50 ? "Good candidate" : "Fair candidate"}
+                  {getScreeningBand(score ?? 0).label} profile
                 </p>
-                <p className="text-gray-500 text-sm">Out of 100 · Scored by AI on clinical knowledge and situational judgment</p>
+                <p className="text-gray-500 text-sm">{getScreeningBand(score ?? 0).description}</p>
+                <p className="text-gray-400 text-xs mt-1">Out of 100 · Scored by AI on clinical knowledge and situational judgment</p>
               </div>
             </div>
+            {(candidate.screening?.feedback as ScreeningFeedback | null)?.strengths?.length ? (
+              <div className="mt-5 border-t border-gray-100 pt-4">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Strengths shown in screening</p>
+                <ul className="space-y-1.5">
+                  {(candidate.screening?.feedback as ScreeningFeedback).strengths.map((s) => (
+                    <li key={s} className="text-sm text-gray-600 flex gap-2">
+                      <span className="text-green-600 flex-shrink-0">✓</span>
+                      <span>{s}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </div>
         )}
       </div>

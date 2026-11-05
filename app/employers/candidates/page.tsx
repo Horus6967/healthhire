@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import UnlockButton from "./UnlockButton";
+import { getScreeningBand } from "@/lib/screeningBand";
 
 export default async function CandidateDiscovery({
   searchParams,
@@ -139,7 +140,7 @@ export default async function CandidateDiscovery({
                           score >= 50 ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
                           "bg-gray-50 text-gray-600 border-gray-200"
                         }`}>
-                          Score: {score}/100
+                          Score: {score}/100 · {getScreeningBand(score).label}
                         </span>
                       )}
                     </div>

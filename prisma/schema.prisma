@@ -72,6 +72,7 @@ model Screening {
   questions   Json
   answers     Json?
   score       Int?
+  feedback    Json?
   status      ScreeningStatus @default(PENDING)
   completedAt DateTime?
   createdAt   DateTime @default(now())

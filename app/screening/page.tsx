@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import { getScreeningBand } from "@/lib/screeningBand";
 
 const SPECIALTIES = [
   "Registered Nurse (RN)", "Licensed Practical Nurse (LPN)", "Physician / MD",
@@ -28,6 +29,8 @@ export default function ScreeningPage() {
   const [loading, setLoading] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [summary, setSummary] = useState("");
+  const [strengths, setStrengths] = useState<string[]>([]);
+  const [improvements, setImprovements] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [currentQ, setCurrentQ] = useState(0);
 
@@ -61,10 +64,18 @@ export default function ScreeningPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ answers }),
       });
-      const data = await res.json() as { score?: number; summary?: string; error?: string };
+      const data = await res.json() as {
+        score?: number;
+        summary?: string;
+        strengths?: string[];
+        improvements?: string[];
+        error?: string;
+      };
       if (!res.ok) throw new Error(data.error || "Failed to submit");
       setScore(data.score ?? null);
       setSummary(data.summary || "");
+      setStrengths(data.strengths || []);
+      setImprovements(data.improvements || []);
       setStep("done");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
@@ -263,17 +274,46 @@ export default function ScreeningPage() {
               ✓ Screening Complete
             </div>
 
-            <h2 className="text-3xl font-bold text-white mb-3">
-              {score >= 75 ? "Excellent score!" : score >= 50 ? "Good score!" : "Screening recorded"}
+            <h2 className="text-3xl font-bold text-white mb-2">
+              {getScreeningBand(score).label} profile
             </h2>
+            <p className="text-white/40 text-sm mb-6">{getScreeningBand(score).description}</p>
 
             {summary && (
-              <p className="text-white/40 text-sm leading-relaxed mb-8 max-w-md mx-auto">{summary}</p>
+              <p className="text-white/50 text-sm leading-relaxed mb-6 max-w-md mx-auto">{summary}</p>
+            )}
+
+            {strengths.length > 0 && (
+              <div className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-5 mb-4 max-w-md mx-auto text-left">
+                <p className="text-xs font-semibold text-white/35 uppercase tracking-wider mb-3">What stood out</p>
+                <ul className="space-y-2">
+                  {strengths.map((s) => (
+                    <li key={s} className="text-sm text-white/60 flex gap-3">
+                      <span className="text-[#3ECF8E] flex-shrink-0">✓</span>
+                      <span>{s}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {improvements.length > 0 && (
+              <div className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-5 mb-8 max-w-md mx-auto text-left">
+                <p className="text-xs font-semibold text-white/35 uppercase tracking-wider mb-3">How to strengthen your profile</p>
+                <ul className="space-y-2">
+                  {improvements.map((s) => (
+                    <li key={s} className="text-sm text-white/60 flex gap-3">
+                      <span className="text-yellow-400 flex-shrink-0">→</span>
+                      <span>{s}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
 
             <div className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-5 text-sm text-white/50 mb-8 max-w-md mx-auto text-left flex gap-3">
               <span className="text-[#3ECF8E] flex-shrink-0">✓</span>
-              <span>Your verified score is now visible to employers on HealthHire. You&apos;re discoverable in the candidate marketplace.</span>
+              <span>Your score and profile band are now visible to employers on HealthHire. The tips above are private to you.</span>
             </div>
 
             <button

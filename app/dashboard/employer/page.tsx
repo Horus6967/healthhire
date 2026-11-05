@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { getScreeningBand } from "@/lib/screeningBand";
 
 export default async function EmployerDashboard() {
   const { userId } = await auth();
@@ -146,7 +147,7 @@ export default async function EmployerDashboard() {
                       )}
                       {score !== undefined && score !== null && (
                         <span className={`text-xs font-semibold border px-2 py-0.5 rounded-full ${scoreColor}`}>
-                          {score}/100
+                          {score}/100 · {getScreeningBand(score).label}
                         </span>
                       )}
                     </div>
