@@ -8,16 +8,16 @@ export default function Navbar() {
   const { isSignedIn, user } = useUser();
 
   return (
-    <nav className="border-b border-gray-200 bg-white sticky top-0 z-50">
+    <nav className="border-b border-white/[0.08] bg-[#0a0a0a]/90 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-14 items-center">
+        <div className="flex justify-between h-16 items-center">
           <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-            <Logo size={30} />
-            <span className="font-bold text-gray-900 text-lg tracking-tight">HealthHire</span>
+            <Logo size={28} />
+            <span className="font-bold text-white text-base tracking-tight">HealthHire</span>
           </Link>
 
-          <div className="flex items-center gap-5">
-            <Link href="/employers/candidates" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors hidden sm:block">
+          <div className="flex items-center gap-6">
+            <Link href="/employers/candidates" className="text-white/60 hover:text-white text-sm font-medium transition-colors hidden sm:block">
               For Employers
             </Link>
 
@@ -25,7 +25,7 @@ export default function Navbar() {
               <div className="flex items-center gap-4">
                 <Link
                   href={user?.publicMetadata?.role === "EMPLOYER" ? "/dashboard/employer" : "/dashboard/candidate"}
-                  className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
+                  className="text-white/60 hover:text-white text-sm font-medium transition-colors"
                 >
                   Dashboard
                 </Link>
@@ -35,15 +35,15 @@ export default function Navbar() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/sign-in"
-                  className="text-[#0A66C2] hover:bg-blue-50 border border-[#0A66C2] px-4 py-1.5 rounded-full text-sm font-semibold transition-colors"
+                  className="text-white/70 hover:text-white px-4 py-1.5 text-sm font-medium transition-colors"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="bg-[#0A66C2] hover:bg-[#004182] text-white px-4 py-1.5 rounded-full text-sm font-semibold transition-colors"
+                  className="bg-[#3ECF8E] hover:bg-[#2db87a] text-black px-4 py-1.5 rounded-md text-sm font-semibold transition-colors"
                 >
-                  Join now
+                  Start for free
                 </Link>
               </div>
             )}
