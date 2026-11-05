@@ -14,8 +14,8 @@ export async function POST(req: Request) {
   const name = [clerkUser?.firstName, clerkUser?.lastName].filter(Boolean).join(" ") || null;
 
   const user = await prisma.user.upsert({
-    where: { clerkId: userId },
-    update: { role: "EMPLOYER" },
+    where: { email },
+    update: { clerkId: userId, role: "EMPLOYER" },
     create: {
       clerkId: userId,
       email,

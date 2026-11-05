@@ -16,8 +16,8 @@ export async function POST(req: Request) {
 
   // Upsert the user — handles both webhook-synced and non-synced users
   const user = await prisma.user.upsert({
-    where: { clerkId: userId },
-    update: { role: "CANDIDATE" },
+    where: { email },
+    update: { clerkId: userId, role: "CANDIDATE" },
     create: {
       clerkId: userId,
       email,
