@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { openai } from "@/lib/openai";
+import { getScreeningQuestions } from "@/lib/screeningQuestions";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -18,23 +18,7 @@ export async function POST(req: Request) {
   }
 
   const { specialty } = await req.json();
-
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: `You are a healthcare recruiter. Generate exactly 5 screening questions for a ${specialty || "healthcare"} professional.
-Return a JSON array of objects with: { id: string, question: string, type: "text" | "multiple_choice", options?: string[] }
-Make questions practical and relevant to real healthcare work. Mix clinical knowledge, situational judgment, and experience questions.`,
-      },
-    ],
-    response_format: { type: "json_object" },
-  });
-
-  const content = completion.choices[0].message.content || "{}";
-  const parsed = JSON.parse(content) as { questions?: Array<Record<string, unknown>> };
-  const questions: Array<Record<string, unknown>> = parsed.questions || [];
+  const questions = getScreeningQuestions(specialty ?? "");
 
   await prisma.screening.upsert({
     where: { candidateId: user.candidate.id },
