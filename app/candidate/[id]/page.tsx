@@ -82,7 +82,15 @@ export default async function CandidateProfilePage({
               <p className="text-gray-600 text-sm">{candidate.headline || candidate.specialty || "Healthcare Professional"}</p>
               <p className="text-gray-400 text-sm mt-0.5">{candidate.location || "Location not specified"}</p>
               {showContact && (
-                <p className="text-blue-600 text-sm font-medium mt-2">{candidate.user.email}</p>
+                <>
+                  <p className="text-blue-600 text-sm font-medium mt-2">{candidate.user.email}</p>
+                  {candidate.phone && <p className="text-gray-600 text-sm mt-1">{candidate.phone}</p>}
+                  {candidate.resumeUrl && (
+                    <a href={candidate.resumeUrl} target="_blank" rel="noopener noreferrer" className="inline-block text-sm font-medium text-blue-600 hover:underline mt-1">
+                      View resume ↗
+                    </a>
+                  )}
+                </>
               )}
             </div>
           </div>

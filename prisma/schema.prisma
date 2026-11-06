@@ -34,6 +34,8 @@ model Candidate {
   location    String?
   specialty   String?
   yearsExp    Int?
+  phone       String?
+  resumeUrl   String?
   workHistory WorkHistory[]
   screening   Screening?
   unlocks     CandidateUnlock[]

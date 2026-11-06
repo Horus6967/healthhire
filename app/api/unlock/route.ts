@@ -26,6 +26,9 @@ export async function POST(req: Request) {
 
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
+    // Turn off Stripe Managed Payments for this checkout: avoids its 3.5% add-on fee
+    // and keeps HealthHire as the seller of record.
+    managed_payments: { enabled: false },
     line_items: [
       {
         price_data: {

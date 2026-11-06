@@ -16,7 +16,7 @@ export default function CandidateOnboarding() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ headline: "", bio: "", location: "", specialty: "" });
+  const [form, setForm] = useState({ headline: "", bio: "", location: "", specialty: "", phone: "", resumeUrl: "" });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -94,6 +94,28 @@ export default function CandidateOnboarding() {
               placeholder="e.g. San Francisco, CA"
               className={inputClass}
             />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Phone number</label>
+            <input
+              type="tel"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              placeholder="e.g. (555) 123-4567"
+              className={inputClass}
+            />
+            <p className="text-xs text-white/25 mt-1.5">Shared with employers only after they unlock your profile</p>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Resume link <span className="text-white/25 font-normal normal-case">(optional)</span></label>
+            <input
+              type="url"
+              value={form.resumeUrl}
+              onChange={(e) => setForm({ ...form, resumeUrl: e.target.value })}
+              placeholder="e.g. a Google Drive or LinkedIn link to your resume"
+              className={inputClass}
+            />
+            <p className="text-xs text-white/25 mt-1.5">Make sure the link is viewable by anyone with the link</p>
           </div>
           <div>
             <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Bio <span className="text-white/25 font-normal normal-case">(optional)</span></label>

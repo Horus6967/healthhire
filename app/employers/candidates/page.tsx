@@ -149,7 +149,15 @@ export default async function CandidateDiscovery({
                     </p>
                     <p className="text-gray-400 text-xs mt-0.5">{candidate.location || "Location not specified"}</p>
                     {isUnlocked && (
-                      <p className="text-blue-600 text-sm font-medium mt-1">{candidate.user.email}</p>
+                      <>
+                        <p className="text-blue-600 text-sm font-medium mt-1">{candidate.user.email}</p>
+                        {candidate.phone && <p className="text-gray-600 text-sm mt-0.5">{candidate.phone}</p>}
+                        {candidate.resumeUrl && (
+                          <a href={candidate.resumeUrl} target="_blank" rel="noopener noreferrer" className="inline-block text-sm font-medium text-blue-600 hover:underline mt-0.5">
+                            View resume ↗
+                          </a>
+                        )}
+                      </>
                     )}
                   </div>
 
